@@ -49,5 +49,6 @@ class CameraService {
 
   Future<void> stopDetection() async {
     await this._cameraController.stopImageStream();
+    dispose();
   }
 }

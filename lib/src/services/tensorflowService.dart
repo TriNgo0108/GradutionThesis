@@ -98,8 +98,6 @@ class TensorflowService {
 
   Future<void> runModelonFrame(CameraImage img) async {
     if (_isLoaded) {
-      print(
-          ">>>>>>>>>>>>>>> stream state ${this._classiferController.isClosed}");
       var classifies = await Tflite.runModelOnFrame(
           bytesList: img.planes.map((plane) => plane.bytes).toList(),
           imageHeight: img.height,

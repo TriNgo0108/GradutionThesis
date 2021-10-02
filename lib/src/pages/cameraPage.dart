@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:virice/src/routes/routeName.dart';
 import 'package:virice/src/services/cameraService.dart';
 import 'package:virice/src/services/tensorflowService.dart';
+import 'package:virice/src/utilities/StringResource.dart';
 
 class CameraPage extends StatefulWidget {
   final CameraDescription cameraDescription;
@@ -75,7 +76,26 @@ class _CameraPageState extends State<CameraPage>
         print(">>>>>>>>>>>>>>This object isn't a rice ");
         _cameraService.pauseCamera();
         _animationDialogController.forward();
-        _showDialog();
+        _showDialog(
+            content: StringResource.isntRice,
+            imgPath: "assets/img/error.png",
+            children: [
+              _dialogButton(Colors.green, onPressTryButton, "Thử lại",
+                  Colors.transparent),
+              _dialogButton(Colors.red, onPressExitButton, "Thoát", Colors.red)
+            ]);
+      } else {
+        print(">>>>>>>>>>>>>This object is a rice");
+        _cameraService.pauseCamera();
+        _showDialog(
+            content: StringResource.isRice,
+            imgPath: "assests/img/complete",
+            children: [
+              _dialogButton(Colors.white, onPressPredictionButton,
+                  StringResource.prediction, Theme.of(context).primaryColor),
+              _dialogButton(Theme.of(context).primaryColor, onPressTryButton,
+                  StringResource.prediction, Colors.transparent)
+            ]);
       }
     });
   }
@@ -98,6 +118,8 @@ class _CameraPageState extends State<CameraPage>
   }
 
   bool _isTryButton(Color color) => color == Colors.green;
+///////////////////////////////////////
+  /// handle dialog button
   void onPressTryButton() {
     _animationDialogController.reverse();
     _cameraService.resumeCamera();
@@ -111,6 +133,13 @@ class _CameraPageState extends State<CameraPage>
         context, (route) => route.settings.name == RouteName.HOME_PAGE);
   }
 
+  void onPressPredictionButton() {
+    // Navigate to result screen
+    _cameraService.resumeCamera();
+  }
+
+///////////////////////////////////////
+// override for backbutton in dialog
   Future<bool> _onWillPop() async {
     _cameraService.resumeCamera();
     print(">>>>>>>>>>resume");
@@ -120,6 +149,8 @@ class _CameraPageState extends State<CameraPage>
     });
   }
 
+///////////////////////////////////////
+  /// dialog button
   Widget _dialogButton(
       Color color, Function onPress, String label, Color backgroundColor) {
     bool isTryButton = _isTryButton(color);
@@ -140,7 +171,10 @@ class _CameraPageState extends State<CameraPage>
         ));
   }
 
-  Future<void> _showDialog() {
+  Future<void> _showDialog(
+      {required String content,
+      required String imgPath,
+      required List<Widget> children}) {
     return showDialog<bool>(
         barrierDismissible: false,
         context: context,
@@ -176,7 +210,7 @@ class _CameraPageState extends State<CameraPage>
                           children: <Widget>[
                             Container(
                               margin: EdgeInsets.only(bottom: 15),
-                              child: Text(
+                              child: const Text(
                                 "Kết quả dự đoán",
                                 style: TextStyle(
                                     fontSize: 22, fontWeight: FontWeight.w600),
@@ -185,19 +219,14 @@ class _CameraPageState extends State<CameraPage>
                             Container(
                               margin: EdgeInsets.only(bottom: 22),
                               child: Text(
-                                "Đối tượng dự đoán không phải là lá lúa. \n Vui lòng thử lại !",
+                                content,
                                 style: TextStyle(fontSize: 14),
                                 textAlign: TextAlign.center,
                               ),
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                _dialogButton(Colors.green, onPressTryButton,
-                                    "Thử lại", Colors.transparent),
-                                _dialogButton(Colors.red, onPressExitButton,
-                                    "Thoát", Colors.red)
-                              ],
+                              children: [...children],
                             ),
                           ],
                         ),
@@ -211,7 +240,7 @@ class _CameraPageState extends State<CameraPage>
                           child: ClipRRect(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(45)),
-                              child: Image.asset("assets/img/error.png")),
+                              child: Image.asset(imgPath)),
                         ),
                       ),
                     ],

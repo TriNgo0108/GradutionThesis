@@ -22,5 +22,15 @@ class StringResource {
       "Do nấm Pirycularia Oryzea Cav gây hại. Trong điều kiện ẩm độ cao, số bào tử mọc ra rất nhiều và gặp điều kiện thuận lợi về nhiệt độ, ẩm độ nấm sẽ xâm nhập vào cây, nấm tiết ra một số độc tố kìm hãm hô hấp và sinh trưởng của cây lúa";
   static String leafBlastSolution =
       " Dọn sạch tàn dư rơm rạ và cỏ dại mang mầm bệnh trên đồng ruộng; gieo cấy các giống kháng hoặc chống chịu với bệnh đạo ôn";
+  //**Khác */
   static String unknown = "Chưa xác định";
+  //**Kết quả */
+  static String isntRice =
+      "Đối tượng dự đoán không phải là lá lúa. \n Vui lòng thử lại !";
+  static String isRice = "Đã phát hiện lá lúa. \n Nhấn kết quả để xem dự đoán";
+  //** Nút bấm hộp thoại */
+  static String tryAgain = "Thử lại";
+  static String exit = "Thoát";
+  static String prediction = "Xem dự đoán";
+  
 }
