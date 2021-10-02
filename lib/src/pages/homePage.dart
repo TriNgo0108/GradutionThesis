@@ -1,11 +1,14 @@
+import 'dart:async';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:virice/src/routes/routeName.dart';
-import 'package:tflite/tflite.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:virice/src/services/tensorflowService.dart';
+import 'package:virice/src/utilities/StringResource.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -13,58 +16,27 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   final ImagePicker _picker = ImagePicker();
+  late AnimationController _animationDialogController;
+  late Animation<double> _dialogAnimation;
+  TensorflowService _tensorflowService = TensorflowService();
 
   _requestPermission() async {
     Map<Permission, PermissionStatus> statuses = await [
       Permission.storage,
+      Permission.camera,
+      Permission.microphone
     ].request();
     final info = statuses[Permission.storage].toString();
     print('$info');
   }
 
-  void _loadModel() async {
-    String? res = await Tflite.loadModel(
-        model: "assets/res/model.tflite",
-        labels: "assets/res/labels.txt",
-        numThreads: 1, // defaults to 1
-        isAsset:
-            true, // defaults to true, set to false to load resources outside assets
-        useGpuDelegate:
-            false // defaults to false, set to true to use GPU delegate
-        );
-    print(res ?? "aaaaa");
-  }
-
   void _onCamera() async {
     final cameras = await availableCameras();
-    // print("choose from camera");
-    // XFile? image = await _picker.pickImage(source: ImageSource.camera);
-    // if (image != null) {
-    //   // Navigator.of(context)
-    //   //     .pushNamed(RouteName.RESUL_TPAGE, arguments: image.path);
-    //   EasyLoading.instance..indicatorType = EasyLoadingIndicatorType.cubeGrid;
-    //   EasyLoading.show(status: "Đang xử lý");
-
-    //   var recognitions = await Tflite.runModelOnImage(
-    //       path: image.path, // required
-    //       imageMean: 0.0, // defaults to 117.0
-    //       imageStd: 255.0, // defaults to 1.0
-    //       numResults: 2, // defaults to 5
-    //       threshold: 0.2, // defaults to 0.1
-    //       asynch: true // defaults to true
-    //       );
-    //   if (recognitions != null) {
-    //     print(recognitions[0]["index"]);
-    //     Navigator.of(context).pushNamed(RouteName.RESULT_PAGE,
-    //         arguments: <String, String>{
-    //           "filePath": image.path,
-    //           "index": recognitions[0]["index"].toString()
-    //         });
-    //   }
-    // }
-    Navigator.of(context).pushNamed(RouteName.CAMERA_PAGE,arguments: cameras.first);
+    Navigator.of(context)
+        .pushNamed(RouteName.CAMERA_PAGE, arguments: cameras.first);
   }
 
   void _onGallery() async {
@@ -73,23 +45,123 @@ class _HomePageState extends State<HomePage> {
     if (image != null) {
       EasyLoading.instance..indicatorType = EasyLoadingIndicatorType.cubeGrid;
       EasyLoading.show(status: "Đang xử lý");
-      var recognitions = await Tflite.runModelOnImage(
-          path: image.path, // required
-          imageMean: 0.0, // defaults to 117.0
-          imageStd: 255.0, // defaults to 1.0
-          numResults: 2, // defaults to 5
-          threshold: 0.2, // defaults to 0.1
-          asynch: true // defaults to true
-          );
-      if (recognitions != null) {
-        print(recognitions[0]["index"]);
+      var recognitions = await _tensorflowService.runModelonImage(image.path);
+      if (recognitions != 4) {
         Navigator.of(context).pushNamed(RouteName.RESULT_PAGE,
             arguments: <String, String>{
               "file": image.path,
-              "index": recognitions[0]["index"].toString()
+              "index": recognitions.toString()
             });
+      } else {
+        EasyLoading.dismiss();
+        _animationDialogController.forward();
+        _showDialog(
+            content: StringResource.isntRice,
+            imgPath: "assets/img/error.png",
+            child: OutlinedButton(
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.green),
+                    side: MaterialStateProperty.all(
+                        BorderSide(color: Colors.green)),
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)))),
+                onPressed: () {
+                  _animationDialogController.reverse();
+                  Timer(const Duration(milliseconds: 800), () {
+                    Navigator.of(context).pop();
+                  });
+                },
+                child: Text(
+                  StringResource.tryAgain,
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                )));
       }
     }
+  }
+
+  Future<bool> _onWillPop() async {
+    _animationDialogController.reverse();
+    return await Future.delayed(Duration(milliseconds: 800), () {
+      return true;
+    });
+  }
+
+  Future<void> _showDialog(
+      {required String content,
+      required String imgPath,
+      required Widget child}) {
+    return showDialog<bool>(
+        barrierDismissible: false,
+        context: context,
+        builder: (_) {
+          return WillPopScope(
+            onWillPop: _onWillPop,
+            child: ScaleTransition(
+              scale: _dialogAnimation,
+              child: Dialog(
+                  backgroundColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Stack(
+                    alignment: Alignment.topCenter,
+                    children: <Widget>[
+                      Container(
+                        // padding: EdgeInsets.only(
+                        //     left: 10, top: 35 + 10, right: 10, bottom: 10),
+                        padding: EdgeInsets.fromLTRB(10, 45, 10, 10),
+                        margin: EdgeInsets.only(top: 45),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.black,
+                                  offset: Offset(0, 10),
+                                  blurRadius: 10),
+                            ]),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(bottom: 15),
+                              child: const Text(
+                                "Thông báo",
+                                style: TextStyle(
+                                    fontSize: 22, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(bottom: 22),
+                              child: Text(
+                                content,
+                                style: TextStyle(fontSize: 14),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Center(
+                              child: child,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        left: 20,
+                        right: 20,
+                        child: CircleAvatar(
+                          backgroundColor: Colors.transparent,
+                          radius: 45,
+                          child: ClipRRect(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(45)),
+                              child: Image.asset(imgPath)),
+                        ),
+                      ),
+                    ],
+                  )),
+            ),
+          );
+        });
   }
 
   void _showModalBottomSheet() {
@@ -158,13 +230,16 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _requestPermission();
-    _loadModel();
+    _tensorflowService.loadModel();
+    _animationDialogController =
+        AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _dialogAnimation = CurvedAnimation(
+        parent: _animationDialogController, curve: Curves.elasticInOut);
   }
 
   @override
   void dispose() {
     super.dispose();
-    Tflite.close();
   }
 
   @override
@@ -187,7 +262,7 @@ class _HomePageState extends State<HomePage> {
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Theme.of(context).accentColor, // remember fix this deprecate
+                    color: Theme.of(context).colorScheme.secondary,
                     border: Border.all(
                         color: Theme.of(context).primaryColor, width: 2)),
                 child: Column(

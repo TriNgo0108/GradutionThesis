@@ -47,7 +47,6 @@ class _CameraPageState extends State<CameraPage>
     try {
       await _cameraService.startCamera(widget.cameraDescription);
       setState(() {});
-      _tensorflowService.loadModel();
       _cameraService.startDetection();
       checkStream();
     } catch (e) {
