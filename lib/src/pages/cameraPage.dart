@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:camera/camera.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:virice/src/routes/routeName.dart';
 import 'package:virice/src/services/cameraService.dart';
@@ -98,6 +99,13 @@ class _CameraPageState extends State<CameraPage>
         context, (route) => route.settings.name == RouteName.HOME_PAGE);
   }
 
+  Future<bool> _onWillPop() async {
+    _cameraService.resumeCamera();
+    print(">>>>>>>>>>resume");
+    Navigator.of(context).pop(true);
+    return Future.value(true);
+  }
+
   Widget _dialogButton(
       Color color, Function onPress, String label, Color backgroundColor) {
     bool isTryButton = _isTryButton(color);
@@ -119,75 +127,81 @@ class _CameraPageState extends State<CameraPage>
   }
 
   Future<void> _showDialog() {
-    return showDialog<void>(
+    return showDialog<bool>(
+        barrierDismissible: false,
         context: context,
         builder: (_) {
-          return Dialog(
-              backgroundColor: Colors.transparent,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-              child: Stack(
-                alignment: Alignment.topCenter,
-                children: <Widget>[
-                  Container(
-                    // padding: EdgeInsets.only(
-                    //     left: 10, top: 35 + 10, right: 10, bottom: 10),
-                    padding: EdgeInsets.fromLTRB(10, 45, 10, 10),
-                    margin: EdgeInsets.only(top: 45),
-                    decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.black,
-                              offset: Offset(0, 10),
-                              blurRadius: 10),
-                        ]),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.only(bottom: 15),
-                          child: Text(
-                            "Kết quả dự đoán",
-                            style: TextStyle(
-                                fontSize: 22, fontWeight: FontWeight.w600),
+          return WillPopScope(
+            onWillPop: _onWillPop,
+            child: Dialog(
+              insetAnimationCurve: Curves.easeIn,
+              insetAnimationDuration: const Duration(microseconds: 350),
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                child: Stack(
+                  alignment: Alignment.topCenter,
+                  children: <Widget>[
+                    Container(
+                      // padding: EdgeInsets.only(
+                      //     left: 10, top: 35 + 10, right: 10, bottom: 10),
+                      padding: EdgeInsets.fromLTRB(10, 45, 10, 10),
+                      margin: EdgeInsets.only(top: 45),
+                      decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black,
+                                offset: Offset(0, 10),
+                                blurRadius: 10),
+                          ]),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.only(bottom: 15),
+                            child: Text(
+                              "Kết quả dự đoán",
+                              style: TextStyle(
+                                  fontSize: 22, fontWeight: FontWeight.w600),
+                            ),
                           ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(bottom: 22),
-                          child: Text(
-                            "Đối tượng dự đoán không phải là lá lúa. \n Vui lòng thử lại !",
-                            style: TextStyle(fontSize: 14),
-                            textAlign: TextAlign.center,
+                          Container(
+                            margin: EdgeInsets.only(bottom: 22),
+                            child: Text(
+                              "Đối tượng dự đoán không phải là lá lúa. \n Vui lòng thử lại !",
+                              style: TextStyle(fontSize: 14),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _dialogButton(Colors.green, onPressTryButton,
-                                "Thử lại", Colors.transparent),
-                            _dialogButton(Colors.red, onPressExitButton,
-                                "Thoát", Colors.red)
-                          ],
-                        ),
-                      ],
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _dialogButton(Colors.green, onPressTryButton,
+                                  "Thử lại", Colors.transparent),
+                              _dialogButton(Colors.red, onPressExitButton,
+                                  "Thoát", Colors.red)
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    left: 20,
-                    right: 20,
-                    child: CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      radius: 45,
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(45)),
-                          child: Image.asset("assets/img/error.png")),
+                    Positioned(
+                      left: 20,
+                      right: 20,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.transparent,
+                        radius: 45,
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(45)),
+                            child: Image.asset("assets/img/error.png")),
+                      ),
                     ),
-                  ),
-                ],
-              ));
+                  ],
+                )),
+          );
         });
   }
 
