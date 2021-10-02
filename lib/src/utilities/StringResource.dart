@@ -31,6 +31,5 @@ class StringResource {
   //** Nút bấm hộp thoại */
   static String tryAgain = "Thử lại";
   static String exit = "Thoát";
-  static String prediction = "Xem dự đoán";
-  
+  static String result = "Kết quả";
 }

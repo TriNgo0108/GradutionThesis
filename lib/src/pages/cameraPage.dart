@@ -87,14 +87,15 @@ class _CameraPageState extends State<CameraPage>
       } else {
         print(">>>>>>>>>>>>>This object is a rice");
         _cameraService.pauseCamera();
+        _animationDialogController.forward();
         _showDialog(
             content: StringResource.isRice,
-            imgPath: "assests/img/complete",
+            imgPath: "assets/img/complete.png",
             children: [
               _dialogButton(Colors.white, onPressPredictionButton,
-                  StringResource.prediction, Theme.of(context).primaryColor),
+                  StringResource.result, Theme.of(context).primaryColor),
               _dialogButton(Theme.of(context).primaryColor, onPressTryButton,
-                  StringResource.prediction, Colors.transparent)
+                  StringResource.tryAgain, Colors.transparent)
             ]);
       }
     });
