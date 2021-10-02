@@ -56,11 +56,6 @@ class _CameraPageState extends State<CameraPage>
   }
 
   checkStream() {
-    // if (_tensorflowService.isFirstInit()) {
-    //   _tensorflowService.classiferController.listen((indexLabel) async {
-    //     subscription(indexLabel);
-    //   });
-    // }
     if (_tensorflowService.isClosedStream()) {
       _tensorflowService.createNewstream();
       _cameraService.resumeCamera();
@@ -72,45 +67,33 @@ class _CameraPageState extends State<CameraPage>
 
   subscription() {
     _tensorflowService.classiferController.listen((indexLabel) {
-      // if (indexLabel == 4) {
-      //   print(">>>>>>>>>>>>>>This object isn't a rice ");
-      //   _cameraService.pauseCamera();
-      //   _animationDialogController.forward();
-      //   _showDialog(
-      //       content: StringResource.isntRice,
-      //       imgPath: "assets/img/error.png",
-      //       children: [
-      //         _dialogButton(Colors.green, onPressTryButton, "Thử lại",
-      //             Colors.transparent),
-      //         _dialogButton(Colors.red, onPressExitButton, "Thoát", Colors.red)
-      //       ]);
-      // } else {
-      //   print(">>>>>>>>>>>>>This object is a rice");
-      //   _cameraService.pauseCamera();
-      //   _animationDialogController.forward();
-      //   _showDialog(
-      //       content: StringResource.isRice,
-      //       imgPath: "assets/img/complete.png",
-      //       children: [
-      //         _dialogButton(Colors.white, onPressPredictionButton,
-      //             StringResource.result, Theme.of(context).primaryColor),
-      //         _dialogButton(Theme.of(context).primaryColor, onPressTryButton,
-      //             StringResource.tryAgain, Colors.transparent)
-      //       ]);
-      // }
-      print(">>>>>>>>>>>>>This object is a rice");
-      _cameraService.pauseCamera();
-      _animationDialogController.forward();
-      _showDialog(
-          content: StringResource.isRice,
-          imgPath: "assets/img/complete.png",
-          children: [
-            _dialogButton(Colors.white, () {
-              onPressPredictionButton(indexLabel);
-            }, StringResource.result, Theme.of(context).primaryColor),
-            _dialogButton(Theme.of(context).primaryColor, onPressTryButton,
-                StringResource.tryAgain, Colors.transparent)
-          ]);
+      if (indexLabel == 4) {
+        print(">>>>>>>>>>>>>>This object isn't a rice ");
+        _cameraService.pauseCamera();
+        _animationDialogController.forward();
+        _showDialog(
+            content: StringResource.isntRice,
+            imgPath: "assets/img/error.png",
+            children: [
+              _dialogButton(Colors.green, onPressTryButton, "Thử lại",
+                  Colors.transparent),
+              _dialogButton(Colors.red, onPressExitButton, "Thoát", Colors.red)
+            ]);
+      } else {
+        print(">>>>>>>>>>>>>This object is a rice");
+        _cameraService.pauseCamera();
+        _animationDialogController.forward();
+        _showDialog(
+            content: StringResource.isRice,
+            imgPath: "assets/img/complete.png",
+            children: [
+              _dialogButton(Colors.white, () {
+                onPressPredictionButton(indexLabel);
+              }, StringResource.result, Theme.of(context).primaryColor),
+              _dialogButton(Theme.of(context).primaryColor, onPressTryButton,
+                  StringResource.tryAgain, Colors.transparent)
+            ]);
+      }
     });
   }
 
