@@ -17,11 +17,13 @@ class CameraPage extends StatefulWidget {
 }
 
 class _CameraPageState extends State<CameraPage>
-    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   TensorflowService _tensorflowService = TensorflowService();
   CameraService _cameraService = CameraService();
   late AnimationController _controller;
   late Animation<double> _animation;
+  late AnimationController _animationDialogController;
+  late Animation<double> _dialogAnimation;
   @override
   void initState() {
     // TODO: implement initState
@@ -33,6 +35,11 @@ class _CameraPageState extends State<CameraPage>
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
     _controller.forward();
     _controller.repeat(reverse: true);
+
+    _animationDialogController =
+        AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _dialogAnimation = CurvedAnimation(
+        parent: _animationDialogController, curve: Curves.elasticInOut);
   }
 
   initialService() async {
@@ -67,6 +74,7 @@ class _CameraPageState extends State<CameraPage>
       if (event == 4) {
         print(">>>>>>>>>>>>>>This object isn't a rice ");
         _cameraService.pauseCamera();
+        _animationDialogController.forward();
         _showDialog();
       }
     });
@@ -83,6 +91,7 @@ class _CameraPageState extends State<CameraPage>
     // TODO: implement dispose
     WidgetsBinding.instance?.removeObserver(this);
     _controller.dispose();
+    _animationDialogController.dispose();
     stopService();
     super.dispose();
     print(">>>>>>>>>dispose");
@@ -90,8 +99,11 @@ class _CameraPageState extends State<CameraPage>
 
   bool _isTryButton(Color color) => color == Colors.green;
   void onPressTryButton() {
-    Navigator.of(context).pop();
+    _animationDialogController.reverse();
     _cameraService.resumeCamera();
+    Timer(const Duration(milliseconds: 800), () {
+      Navigator.of(context).pop();
+    });
   }
 
   void onPressExitButton() {
@@ -102,8 +114,10 @@ class _CameraPageState extends State<CameraPage>
   Future<bool> _onWillPop() async {
     _cameraService.resumeCamera();
     print(">>>>>>>>>>resume");
-    Navigator.of(context).pop(true);
-    return Future.value(true);
+    _animationDialogController.reverse();
+    return await Future.delayed(Duration(milliseconds: 800), () {
+      return true;
+    });
   }
 
   Widget _dialogButton(
@@ -133,104 +147,109 @@ class _CameraPageState extends State<CameraPage>
         builder: (_) {
           return WillPopScope(
             onWillPop: _onWillPop,
-            child: Dialog(
-              insetAnimationCurve: Curves.easeIn,
-              insetAnimationDuration: const Duration(microseconds: 350),
-                backgroundColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                child: Stack(
-                  alignment: Alignment.topCenter,
-                  children: <Widget>[
-                    Container(
-                      // padding: EdgeInsets.only(
-                      //     left: 10, top: 35 + 10, right: 10, bottom: 10),
-                      padding: EdgeInsets.fromLTRB(10, 45, 10, 10),
-                      margin: EdgeInsets.only(top: 45),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.black,
-                                offset: Offset(0, 10),
-                                blurRadius: 10),
-                          ]),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.only(bottom: 15),
-                            child: Text(
-                              "Kết quả dự đoán",
-                              style: TextStyle(
-                                  fontSize: 22, fontWeight: FontWeight.w600),
+            child: ScaleTransition(
+              scale: _dialogAnimation,
+              child: Dialog(
+                  backgroundColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Stack(
+                    alignment: Alignment.topCenter,
+                    children: <Widget>[
+                      Container(
+                        // padding: EdgeInsets.only(
+                        //     left: 10, top: 35 + 10, right: 10, bottom: 10),
+                        padding: EdgeInsets.fromLTRB(10, 45, 10, 10),
+                        margin: EdgeInsets.only(top: 45),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.black,
+                                  offset: Offset(0, 10),
+                                  blurRadius: 10),
+                            ]),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(bottom: 15),
+                              child: Text(
+                                "Kết quả dự đoán",
+                                style: TextStyle(
+                                    fontSize: 22, fontWeight: FontWeight.w600),
+                              ),
                             ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(bottom: 22),
-                            child: Text(
-                              "Đối tượng dự đoán không phải là lá lúa. \n Vui lòng thử lại !",
-                              style: TextStyle(fontSize: 14),
-                              textAlign: TextAlign.center,
+                            Container(
+                              margin: EdgeInsets.only(bottom: 22),
+                              child: Text(
+                                "Đối tượng dự đoán không phải là lá lúa. \n Vui lòng thử lại !",
+                                style: TextStyle(fontSize: 14),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              _dialogButton(Colors.green, onPressTryButton,
-                                  "Thử lại", Colors.transparent),
-                              _dialogButton(Colors.red, onPressExitButton,
-                                  "Thoát", Colors.red)
-                            ],
-                          ),
-                        ],
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _dialogButton(Colors.green, onPressTryButton,
+                                    "Thử lại", Colors.transparent),
+                                _dialogButton(Colors.red, onPressExitButton,
+                                    "Thoát", Colors.red)
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Positioned(
-                      left: 20,
-                      right: 20,
-                      child: CircleAvatar(
-                        backgroundColor: Colors.transparent,
-                        radius: 45,
-                        child: ClipRRect(
-                            borderRadius: BorderRadius.all(Radius.circular(45)),
-                            child: Image.asset("assets/img/error.png")),
+                      Positioned(
+                        left: 20,
+                        right: 20,
+                        child: CircleAvatar(
+                          backgroundColor: Colors.transparent,
+                          radius: 45,
+                          child: ClipRRect(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(45)),
+                              child: Image.asset("assets/img/error.png")),
+                        ),
                       ),
-                    ),
-                  ],
-                )),
+                    ],
+                  )),
+            ),
           );
         });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(alignment: Alignment.topCenter, children: [
-      CameraPreview(
-        _cameraService.cameraController,
-      ),
-      Positioned(
-          bottom: MediaQuery.of(context).size.height * 0.1,
-          child: AnimatedBuilder(
-            animation: _animation,
-            builder: (_, child) {
-              return Opacity(
-                opacity: _animation.value,
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10)),
-                  padding: EdgeInsets.all(15),
-                  child: Text(
-                    "Di chuyển đến lá lúa cần dự đoán",
-                    style: Theme.of(context).textTheme.headline3,
-                  ),
-                ),
-              );
-            },
-          ))
-    ]);
+    return Stack(
+        fit: StackFit.expand,
+        alignment: Alignment.topCenter,
+        children: [
+          CameraPreview(
+            _cameraService.cameraController,
+          ),
+          Positioned(
+              bottom: MediaQuery.of(context).size.height * 0.1,
+              child: AnimatedBuilder(
+                animation: _animation,
+                builder: (_, child) {
+                  return Opacity(
+                    opacity: _animation.value,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10)),
+                      padding: EdgeInsets.all(15),
+                      child: Text(
+                        "Di chuyển đến lá lúa cần dự đoán",
+                        style: Theme.of(context).textTheme.headline3,
+                      ),
+                    ),
+                  );
+                },
+              ))
+        ]);
   }
 }
