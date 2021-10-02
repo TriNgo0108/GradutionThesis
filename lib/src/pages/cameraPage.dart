@@ -1,8 +1,7 @@
 import 'dart:async';
-
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:virice/src/routes/routeName.dart';
 import 'package:virice/src/services/cameraService.dart';
 import 'package:virice/src/services/tensorflowService.dart';
@@ -57,8 +56,8 @@ class _CameraPageState extends State<CameraPage>
 
   checkStream() {
     // if (_tensorflowService.isFirstInit()) {
-    //   _tensorflowService.classiferController.listen((event) async {
-    //     subscription(event);
+    //   _tensorflowService.classiferController.listen((indexLabel) async {
+    //     subscription(indexLabel);
     //   });
     // }
     if (_tensorflowService.isClosedStream()) {
@@ -71,33 +70,46 @@ class _CameraPageState extends State<CameraPage>
   }
 
   subscription() {
-    _tensorflowService.classiferController.listen((event) {
-      if (event == 4) {
-        print(">>>>>>>>>>>>>>This object isn't a rice ");
-        _cameraService.pauseCamera();
-        _animationDialogController.forward();
-        _showDialog(
-            content: StringResource.isntRice,
-            imgPath: "assets/img/error.png",
-            children: [
-              _dialogButton(Colors.green, onPressTryButton, "Thử lại",
-                  Colors.transparent),
-              _dialogButton(Colors.red, onPressExitButton, "Thoát", Colors.red)
-            ]);
-      } else {
-        print(">>>>>>>>>>>>>This object is a rice");
-        _cameraService.pauseCamera();
-        _animationDialogController.forward();
-        _showDialog(
-            content: StringResource.isRice,
-            imgPath: "assets/img/complete.png",
-            children: [
-              _dialogButton(Colors.white, onPressPredictionButton,
-                  StringResource.result, Theme.of(context).primaryColor),
-              _dialogButton(Theme.of(context).primaryColor, onPressTryButton,
-                  StringResource.tryAgain, Colors.transparent)
-            ]);
-      }
+    _tensorflowService.classiferController.listen((indexLabel) {
+      // if (indexLabel == 4) {
+      //   print(">>>>>>>>>>>>>>This object isn't a rice ");
+      //   _cameraService.pauseCamera();
+      //   _animationDialogController.forward();
+      //   _showDialog(
+      //       content: StringResource.isntRice,
+      //       imgPath: "assets/img/error.png",
+      //       children: [
+      //         _dialogButton(Colors.green, onPressTryButton, "Thử lại",
+      //             Colors.transparent),
+      //         _dialogButton(Colors.red, onPressExitButton, "Thoát", Colors.red)
+      //       ]);
+      // } else {
+      //   print(">>>>>>>>>>>>>This object is a rice");
+      //   _cameraService.pauseCamera();
+      //   _animationDialogController.forward();
+      //   _showDialog(
+      //       content: StringResource.isRice,
+      //       imgPath: "assets/img/complete.png",
+      //       children: [
+      //         _dialogButton(Colors.white, onPressPredictionButton,
+      //             StringResource.result, Theme.of(context).primaryColor),
+      //         _dialogButton(Theme.of(context).primaryColor, onPressTryButton,
+      //             StringResource.tryAgain, Colors.transparent)
+      //       ]);
+      // }
+      print(">>>>>>>>>>>>>This object is a rice");
+      _cameraService.pauseCamera();
+      _animationDialogController.forward();
+      _showDialog(
+          content: StringResource.isRice,
+          imgPath: "assets/img/complete.png",
+          children: [
+            _dialogButton(Colors.white, () {
+              onPressPredictionButton(indexLabel);
+            }, StringResource.result, Theme.of(context).primaryColor),
+            _dialogButton(Theme.of(context).primaryColor, onPressTryButton,
+                StringResource.tryAgain, Colors.transparent)
+          ]);
     });
   }
 
@@ -134,9 +146,19 @@ class _CameraPageState extends State<CameraPage>
         context, (route) => route.settings.name == RouteName.HOME_PAGE);
   }
 
-  void onPressPredictionButton() {
+  void onPressPredictionButton(indexLabel) async {
     // Navigate to result screen
-    _cameraService.resumeCamera();
+    _animationDialogController.reverse();
+    _cameraService.stopDetection();
+    EasyLoading.instance..indicatorType = EasyLoadingIndicatorType.cubeGrid;
+    EasyLoading.show(status: "Đang xử lý");
+    String path = await _cameraService.takeImage();
+    print(">>>>>>>>>>>>>>>>>>>>>>>>path $path");
+    Navigator.of(context).pushNamed(RouteName.RESULT_PAGE,
+        arguments: <String, String>{
+          "file": path,
+          "index": indexLabel.toString()
+        });
   }
 
 ///////////////////////////////////////

@@ -17,10 +17,10 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => HomePage());
       case RouteName.RESULT_PAGE:
         // Validation of correct data type
-        if ((args as Map)["file"] is String || args["bytes"] is Uint8List) {
+        if ((args as Map)["file"] is String) {
           return MaterialPageRoute(
             builder: (_) => ResultPage(
-              file: args['file'] != null ? args["file"] : args["bytes"],
+              file: args['file'],
               index: args["index"],
             ),
           );

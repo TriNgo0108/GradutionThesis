@@ -21,6 +21,11 @@ class CameraService {
     return _cameraController.initialize();
   }
 
+  Future<String> takeImage() async {
+    XFile file = await _cameraController.takePicture();
+    return file.path;
+  }
+
   void dispose() {
     _cameraController.dispose();
   }
@@ -49,6 +54,5 @@ class CameraService {
 
   Future<void> stopDetection() async {
     await this._cameraController.stopImageStream();
-    dispose();
   }
 }
