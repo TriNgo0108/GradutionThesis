@@ -36,7 +36,6 @@ dependencies:
     flutter_easyloading: ^3.0.0
     tflite: ^1.1.2
     camera: ^0.9.4+1
-    image: ^3.0.7
 
 dev_dependencies:
     flutter_test:
