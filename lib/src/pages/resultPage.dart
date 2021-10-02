@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:virice/src/routes/routeName.dart';
 import 'package:virice/src/utilities/diseaseDetail.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -60,6 +61,12 @@ class _ResultPageState extends State<ResultPage> {
         fontSize: 16.0);
   }
 
+  Future<bool> _onWillPop() async {
+    Navigator.popUntil(
+        context, (route) => route.settings.name == RouteName.HOME_PAGE);
+    return true;
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -75,66 +82,71 @@ class _ResultPageState extends State<ResultPage> {
     var solution = disease.getSolution();
     IconThemeData iconThemeData = Theme.of(context).iconTheme;
     final height = MediaQuery.of(context).size.height;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Kết quả",
-          style: Theme.of(context).textTheme.headline1,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            "Kết quả",
+            style: Theme.of(context).textTheme.headline1,
+          ),
+          actions: [
+            IconButton(
+                onPressed: takeScreenShot,
+                icon: FaIcon(FontAwesomeIcons.solidImage))
+          ],
         ),
-        actions: [
-          IconButton(
-              onPressed: takeScreenShot,
-              icon: FaIcon(FontAwesomeIcons.solidImage))
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(
-          Icons.add,
-          color: iconThemeData.color,
-          size: iconThemeData.size,
+        floatingActionButton: FloatingActionButton(
+          child: Icon(
+            Icons.add,
+            color: iconThemeData.color,
+            size: iconThemeData.size,
+          ),
+          backgroundColor: Theme.of(context).primaryColor,
+          onPressed: () {
+            // Navigator.of(context).pop();
+            Navigator.popUntil(
+                context, (route) => route.settings.name == RouteName.HOME_PAGE);
+          },
         ),
-        backgroundColor: Theme.of(context).primaryColor,
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            RepaintBoundary(
-              key: saveImage,
-              child: Container(
-                constraints: BoxConstraints(minHeight: height * 0.87),
-                color: Colors.white,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                        width: double.infinity,
-                        height: height * 0.4,
-                        child: widget.file != null
-                            ? Image.file(
-                                File(widget.file as String),
-                                fit: BoxFit.cover,
-                              )
-                            : Image.memory(
-                                widget.uint8listImage as Uint8List,
-                                height: height * 0.4,
-                                fit: BoxFit.cover,
-                              )),
-                    _indexWidget("Bệnh được dự đoán"),
-                    _contentWidget(name),
-                    _indexWidget("Nguyên nhân"),
-                    _contentWidget(reason),
-                    _indexWidget("Phòng trừ"),
-                    _contentWidget(solution)
-                  ],
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              RepaintBoundary(
+                key: saveImage,
+                child: Container(
+                  constraints: BoxConstraints(minHeight: height * 0.87),
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 20, horizontal: 10),
+                          width: double.infinity,
+                          height: height * 0.4,
+                          child: widget.file != null
+                              ? Image.file(
+                                  File(widget.file as String),
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.memory(
+                                  widget.uint8listImage as Uint8List,
+                                  height: height * 0.4,
+                                  fit: BoxFit.cover,
+                                )),
+                      _indexWidget("Bệnh được dự đoán"),
+                      _contentWidget(name),
+                      _indexWidget("Nguyên nhân"),
+                      _contentWidget(reason),
+                      _indexWidget("Phòng trừ"),
+                      _contentWidget(solution)
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

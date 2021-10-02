@@ -20,6 +20,7 @@ class _CameraPageState extends State<CameraPage>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   TensorflowService _tensorflowService = TensorflowService();
   CameraService _cameraService = CameraService();
+  bool isCameraStop = false;
   late AnimationController _controller;
   late Animation<double> _animation;
   late AnimationController _animationDialogController;
@@ -114,7 +115,9 @@ class _CameraPageState extends State<CameraPage>
   }
 
   stopService() async {
-    await _cameraService.stopDetection();
+    if (!isCameraStop) {
+      await _cameraService.stopDetection();
+    }
     _tensorflowService.stopPrediction();
     print(">>>>>>>>Stop");
   }
@@ -150,6 +153,7 @@ class _CameraPageState extends State<CameraPage>
     // Navigate to result screen
     _animationDialogController.reverse();
     _cameraService.stopDetection();
+    isCameraStop = true;
     EasyLoading.instance..indicatorType = EasyLoadingIndicatorType.cubeGrid;
     EasyLoading.show(status: "Đang xử lý");
     String path = await _cameraService.takeImage();
