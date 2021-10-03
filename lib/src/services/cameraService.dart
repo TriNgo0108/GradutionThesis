@@ -13,7 +13,8 @@ class CameraService {
   TensorflowService _tensorflowService = TensorflowService();
   CameraController get cameraController => _cameraController;
   late CameraController _cameraController;
-  bool _isAvaiable = true;
+  bool _isStopStream = false;
+  bool get isStopStream => this._isStopStream;
 
   Future startCamera(CameraDescription cameraDescription) {
     _cameraController =
@@ -30,21 +31,20 @@ class CameraService {
     _cameraController.dispose();
   }
 
-  void pauseCamera() {
-    _isAvaiable = false;
-  }
+  // void pauseCamera() {
+  //   _isAvaiable = false;
+  // }
 
-  void resumeCamera() {
-    _isAvaiable = true;
-  }
+  // void resumeCamera() {
+  //   _isAvaiable = true;
+  // }
 
   Future<void> startDetection() async {
+    _isStopStream = false;
     _cameraController.startImageStream((image) async {
       try {
-        if (_isAvaiable) {
-          _isAvaiable = false;
+        if (_tensorflowService.isFinishedPredict) {
           await _tensorflowService.runModelonFrame(image);
-          _isAvaiable = true;
         }
       } catch (e) {
         print("Error in camera service: $e");
@@ -54,5 +54,7 @@ class CameraService {
 
   Future<void> stopDetection() async {
     await this._cameraController.stopImageStream();
+    _tensorflowService.stopPrediction();
+    _isStopStream = true;
   }
 }
