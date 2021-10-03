@@ -20,6 +20,7 @@ class _CameraPageState extends State<CameraPage>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   TensorflowService _tensorflowService = TensorflowService();
   CameraService _cameraService = CameraService();
+  bool isCameraStop = false;
   late AnimationController _controller;
   late Animation<double> _animation;
   late AnimationController _animationDialogController;
@@ -56,7 +57,7 @@ class _CameraPageState extends State<CameraPage>
   checkStream() {
     if (_tensorflowService.isClosedStream()) {
       _tensorflowService.createNewstream();
-      _cameraService.startDetection();
+      _cameraService.resumeCamera();
       subscription();
     } else {
       subscription();
@@ -64,12 +65,10 @@ class _CameraPageState extends State<CameraPage>
   }
 
   subscription() {
-    _tensorflowService.classiferController.listen((indexLabel) async {
-      if (!_cameraService.isStopStream) {
-        await _cameraService.stopDetection();
-      }
+    _tensorflowService.classiferController.listen((indexLabel) {
       if (indexLabel == 4) {
         print(">>>>>>>>>>>>>>This object isn't a rice ");
+        _cameraService.pauseCamera();
         _animationDialogController.forward();
         _showDialog(
             content: StringResource.isntRice,
@@ -81,7 +80,7 @@ class _CameraPageState extends State<CameraPage>
             ]);
       } else {
         print(">>>>>>>>>>>>>This object is a rice");
-        // _cameraService.startDetection();
+        _cameraService.pauseCamera();
         _animationDialogController.forward();
         _showDialog(
             content: StringResource.isRice,
@@ -98,7 +97,7 @@ class _CameraPageState extends State<CameraPage>
   }
 
   stopService() async {
-    if (!_cameraService.isStopStream) {
+    if (!isCameraStop) {
       await _cameraService.stopDetection();
     }
     _tensorflowService.stopPrediction();
@@ -121,7 +120,7 @@ class _CameraPageState extends State<CameraPage>
   /// handle dialog button
   void onPressTryButton() {
     _animationDialogController.reverse();
-    checkStream();
+    _cameraService.resumeCamera();
     Timer(const Duration(milliseconds: 800), () {
       Navigator.of(context).pop();
     });
@@ -136,6 +135,7 @@ class _CameraPageState extends State<CameraPage>
     // Navigate to result screen
     _animationDialogController.reverse();
     _cameraService.stopDetection();
+    isCameraStop = true;
     EasyLoading.instance..indicatorType = EasyLoadingIndicatorType.cubeGrid;
     EasyLoading.show(status: "Đang xử lý");
     String path = await _cameraService.takeImage();
@@ -150,7 +150,7 @@ class _CameraPageState extends State<CameraPage>
 ///////////////////////////////////////
 // override for backbutton in dialog
   Future<bool> _onWillPop() async {
-    checkStream();
+    _cameraService.resumeCamera();
     print(">>>>>>>>>>resume");
     _animationDialogController.reverse();
     return await Future.delayed(Duration(milliseconds: 800), () {

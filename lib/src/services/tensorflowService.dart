@@ -14,8 +14,10 @@ class TensorflowService {
   StreamController<int> _classiferController = StreamController();
   Stream get classiferController => this._classiferController.stream;
   bool _isLoaded = false;
-  bool _finishPredicted = true;
-  bool get isFinishedPredict => _finishPredicted;
+  bool _firstInit = true;
+
+  bool isFirstInit() => _firstInit;
+
   void createNewstream() {
     this._classiferController = StreamController();
   }
@@ -39,8 +41,7 @@ class TensorflowService {
   }
 
   Future<void> runModelonFrame(CameraImage img) async {
-    if (_isLoaded && _finishPredicted) {
-      _finishPredicted = false;
+    if (_isLoaded) {
       Stopwatch stopwatch = Stopwatch()..start();
       var classifies = await Tflite.runModelOnFrame(
           bytesList: img.planes.map((plane) => plane.bytes).toList(),
@@ -51,7 +52,6 @@ class TensorflowService {
           threshold: 0.2,
           numResults: 1);
       if (classifies != null) {
-        _finishPredicted = true;
         print(">>>>>>>>>${stopwatch.elapsed}");
         int predictionIndex = classifies[0]["index"];
         this._classiferController.add(predictionIndex);
@@ -82,6 +82,7 @@ class TensorflowService {
     if (!this._classiferController.isClosed) {
       this._classiferController.close();
       print("stream State ${this._classiferController.isClosed}");
+      _firstInit = false;
     }
   }
 
