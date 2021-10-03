@@ -226,11 +226,15 @@ class _HomePageState extends State<HomePage>
         });
   }
 
+  loadModel() async {
+    await _tensorflowService.loadModel();
+  }
+
   @override
   void initState() {
     super.initState();
     _requestPermission();
-    _tensorflowService.loadModel();
+    loadModel();
     _animationDialogController =
         AnimationController(vsync: this, duration: Duration(seconds: 1));
     _dialogAnimation = CurvedAnimation(
@@ -240,6 +244,7 @@ class _HomePageState extends State<HomePage>
   @override
   void dispose() {
     super.dispose();
+    _tensorflowService.close();
   }
 
   @override

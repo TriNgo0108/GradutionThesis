@@ -28,9 +28,13 @@ class TensorflowService {
 
   Future<void> loadModel() async {
     try {
+      Stopwatch stopwatch = Stopwatch()..start();
       await Tflite.loadModel(
-          model: "assets/res/model.tflite", labels: "assets/res/labels.txt");
+          model: "assets/res/model.tflite",
+          labels: "assets/res/labels.txt",
+          numThreads: 3);
       _isLoaded = true;
+      print(">>>>>>>>>${stopwatch.elapsed}");
     } catch (e) {
       print("Error in TensorflowService: $e ");
     }
@@ -38,6 +42,7 @@ class TensorflowService {
 
   Future<void> runModelonFrame(CameraImage img) async {
     if (_isLoaded) {
+      Stopwatch stopwatch = Stopwatch()..start();
       var classifies = await Tflite.runModelOnFrame(
           bytesList: img.planes.map((plane) => plane.bytes).toList(),
           imageHeight: img.height,
@@ -47,6 +52,7 @@ class TensorflowService {
           threshold: 0.2,
           numResults: 1);
       if (classifies != null) {
+        print(">>>>>>>>>${stopwatch.elapsed}");
         int predictionIndex = classifies[0]["index"];
         this._classiferController.add(predictionIndex);
       }
@@ -55,6 +61,7 @@ class TensorflowService {
 
   Future<int> runModelonImage(String path) async {
     if (_isLoaded) {
+      Stopwatch stopwatch = Stopwatch()..start();
       var classifies = await Tflite.runModelOnImage(
           path: path,
           imageMean: 0.0,
@@ -62,6 +69,7 @@ class TensorflowService {
           threshold: 0.2,
           numResults: 1);
       if (classifies != null) {
+        print(">>>>>>>>>${stopwatch.elapsed}");
         print("Prediction result: ${classifies[0]["index"]}");
         int predictionIndex = classifies[0]["index"];
         return predictionIndex;
@@ -76,5 +84,9 @@ class TensorflowService {
       print("stream State ${this._classiferController.isClosed}");
       _firstInit = false;
     }
+  }
+
+  close() {
+    _tensorflowService.close();
   }
 }
