@@ -15,7 +15,7 @@ class CameraService {
   late CameraController _cameraController;
   bool _isAvaiable = true;
 
-  Future startCamera(CameraDescription cameraDescription) {
+  Future<void> startCamera(CameraDescription cameraDescription) {
     _cameraController =
         CameraController(cameraDescription, ResolutionPreset.high);
     return _cameraController.initialize();
@@ -52,7 +52,7 @@ class CameraService {
     });
   }
 
-  Future<void> stopDetection() async {
-    await this._cameraController.stopImageStream();
+  stopDetection() {
+    this._cameraController.stopImageStream();
   }
 }

@@ -35,8 +35,10 @@ class _HomePageState extends State<HomePage>
 
   void _onCamera() async {
     final cameras = await availableCameras();
-    Navigator.of(context)
-        .pushNamed(RouteName.CAMERA_PAGE, arguments: cameras.first);
+    Timer(const Duration(milliseconds: 500), () {
+      Navigator.of(context)
+          .pushNamed(RouteName.CAMERA_PAGE, arguments: cameras.first);
+    });
   }
 
   void _onGallery() async {

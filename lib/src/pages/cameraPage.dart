@@ -36,18 +36,17 @@ class _CameraPageState extends State<CameraPage>
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
     _controller.forward();
     _controller.repeat(reverse: true);
-
-    _animationDialogController =
-        AnimationController(vsync: this, duration: Duration(seconds: 1));
-    _dialogAnimation = CurvedAnimation(
-        parent: _animationDialogController, curve: Curves.elasticInOut);
   }
 
   initialService() async {
     try {
-      await _cameraService.startCamera(widget.cameraDescription);
+      Stopwatch stopwatch = Stopwatch()..start();
+      print(">>>>>>>>>>>>>>>>>>>>>>>camera: ${stopwatch.elapsed}");
       setState(() {});
-      _cameraService.startDetection();
+      _animationDialogController =
+          AnimationController(vsync: this, duration: Duration(seconds: 1));
+      _dialogAnimation = CurvedAnimation(
+          parent: _animationDialogController, curve: Curves.elasticInOut);
       checkStream();
     } catch (e) {
       print("Error here $e");
@@ -261,33 +260,43 @@ class _CameraPageState extends State<CameraPage>
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-        fit: StackFit.expand,
-        alignment: Alignment.topCenter,
-        children: [
-          CameraPreview(
-            _cameraService.cameraController,
-          ),
-          Positioned(
-              bottom: MediaQuery.of(context).size.height * 0.1,
-              child: AnimatedBuilder(
-                animation: _animation,
-                builder: (_, child) {
-                  return Opacity(
-                    opacity: _animation.value,
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10)),
-                      padding: EdgeInsets.all(15),
-                      child: Text(
-                        "Di chuyển đến lá lúa cần dự đoán",
-                        style: Theme.of(context).textTheme.headline3,
-                      ),
-                    ),
-                  );
-                },
-              ))
-        ]);
+    return FutureBuilder(
+      future: _cameraService.startCamera(widget.cameraDescription),
+      builder: (context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          _cameraService.startDetection();
+          return Stack(
+              fit: StackFit.expand,
+              alignment: Alignment.topCenter,
+              children: [
+                CameraPreview(
+                  _cameraService.cameraController,
+                ),
+                Positioned(
+                    bottom: MediaQuery.of(context).size.height * 0.1,
+                    child: AnimatedBuilder(
+                      animation: _animation,
+                      builder: (_, child) {
+                        return Opacity(
+                          opacity: _animation.value,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10)),
+                            padding: EdgeInsets.all(15),
+                            child: Text(
+                              "Di chuyển đến lá lúa cần dự đoán",
+                              style: Theme.of(context).textTheme.headline3,
+                            ),
+                          ),
+                        );
+                      },
+                    ))
+              ]);
+        }
+        // return Container(child: CircularProgressIndicator());
+        return Text("Đang khởi tạo");
+      },
+    );
   }
 }
