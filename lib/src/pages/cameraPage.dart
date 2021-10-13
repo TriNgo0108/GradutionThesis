@@ -152,7 +152,7 @@ class _CameraPageState extends State<CameraPage>
     _cameraService.resumeCamera();
     print(">>>>>>>>>>resume");
     _animationDialogController.reverse();
-    return await Future.delayed(Duration(milliseconds: 800), () {
+    return await Future.delayed(Duration(milliseconds: 50), () {
       return true;
     });
   }
