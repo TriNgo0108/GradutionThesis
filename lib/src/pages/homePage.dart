@@ -82,6 +82,11 @@ class _HomePageState extends State<HomePage>
     }
   }
 
+  void _onChange(String? locale) {
+    context.setLocale(Locale(locale!));
+    setState(() {});
+  }
+
   Future<bool> _onWillPop() async {
     _animationDialogController.reverse();
     return await Future.delayed(Duration(milliseconds: 800), () {
@@ -245,14 +250,6 @@ class _HomePageState extends State<HomePage>
   }
 
   @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-    context.setLocale(Locale("en"));
-    setState(() {});
-  }
-
-  @override
   void dispose() {
     super.dispose();
     _tensorflowService.close();
@@ -262,6 +259,7 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
+    String language = context.locale.toString();
     return Scaffold(
       appBar: AppBar(
         title: Text(LocaleKeys.title).tr(),
@@ -270,6 +268,48 @@ class _HomePageState extends State<HomePage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
+            Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(left: width * 0.1, right: 20),
+                  child: Text(
+                    LocaleKeys.language.tr() + ":",
+                    style: Theme.of(context).textTheme.headline3,
+                  ),
+                ),
+                DropdownButton(
+                    value: language,
+                    onChanged: _onChange,
+                    icon: FaIcon(
+                      FontAwesomeIcons.caretDown,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    iconSize: 18,
+                    elevation: 16,
+                    underline: Container(
+                      height: 2,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        child: Text("Tiếng việt",
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline3
+                                ?.copyWith(fontSize: 14)),
+                        value: "vi",
+                      ),
+                      DropdownMenuItem(
+                        child: Text("English",
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline3
+                                ?.copyWith(fontSize: 14)),
+                        value: "en",
+                      ),
+                    ])
+              ],
+            ),
             GestureDetector(
               onTap: _showModalBottomSheet,
               child: Container(

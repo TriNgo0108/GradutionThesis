@@ -15,7 +15,8 @@ class CodegenLoader extends AssetLoader{
   }
 
   static const Map<String,dynamic> en = {
-  "language": "english",
+  "language": "Language",
+  "languageName": "english",
   "title": "Predict disease",
   "fromCamera": "From camera",
   "fromGallery": "From gallery",
@@ -57,7 +58,8 @@ class CodegenLoader extends AssetLoader{
   }
 };
 static const Map<String,dynamic> vi = {
-  "language": "Tiếng Việt",
+  "language": "Ngôn ngữ",
+  "languageName": "Tiếng Việt",
   "title": "Dự đoán bệnh",
   "fromCamera": "Từ camera",
   "fromGallery": "Từ thư viện",

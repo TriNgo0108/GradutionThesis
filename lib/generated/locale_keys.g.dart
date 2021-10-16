@@ -2,6 +2,7 @@
 
 abstract class  LocaleKeys {
   static const language = 'language';
+  static const languageName = 'languageName';
   static const title = 'title';
   static const fromCamera = 'fromCamera';
   static const fromGallery = 'fromGallery';

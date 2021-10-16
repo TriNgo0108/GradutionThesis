@@ -1,5 +1,6 @@
 {
-    "language":"english",
+    "language":"Language",
+    "languageName":"english",
     "title":"Predict disease",
     "fromCamera":"From camera",
     "fromGallery":"From gallery",
