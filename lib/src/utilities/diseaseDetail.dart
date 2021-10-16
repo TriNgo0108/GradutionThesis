@@ -1,4 +1,5 @@
-import 'package:virice/src/utilities/StringResource.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:virice/generated/locale_keys.g.dart';
 
 class DiseaseDetail {
   final int diseaseName;
@@ -6,45 +7,45 @@ class DiseaseDetail {
   String getName() {
     switch (this.diseaseName) {
       case 0:
-        return StringResource.brownSpot;
+        return LocaleKeys.diseaseName_brownSpot.tr();
       case 1:
-        return StringResource.healthy;
+        return LocaleKeys.diseaseName_healthy.tr();
       case 2:
-        return StringResource.hispa;
+        return LocaleKeys.diseaseName_hispa.tr();
       case 3:
-        return StringResource.leafBlast;
+        return LocaleKeys.diseaseName_leafBlast.tr();
       default:
-        return StringResource.unknown;
+        return LocaleKeys.diseaseName_unknown.tr();
     }
   }
 
   String getReason() {
     switch (this.diseaseName) {
       case 0:
-        return StringResource.brownSpotReason;
+        return LocaleKeys.diseaseReason_brownSpot.tr();
       case 1:
-        return StringResource.healthyReason;
+        return LocaleKeys.diseaseReason_healthy.tr();
       case 2:
-        return StringResource.hispaReason;
+        return LocaleKeys.diseaseReason_hispa.tr();
       case 3:
-        return StringResource.leafBlastReason;
+        return LocaleKeys.diseaseReason_leafBlast.tr();
       default:
-        return StringResource.unknown;
+        return LocaleKeys.diseaseReason_unknown.tr();
     }
   }
 
   String getSolution() {
     switch (this.diseaseName) {
       case 0:
-        return StringResource.brownSpotSolution;
+        return LocaleKeys.diseaseSolution_brownSpot.tr();
       case 1:
-        return StringResource.healthySolution;
+        return LocaleKeys.diseaseSolution_healthy.tr();
       case 2:
-        return StringResource.hispaSolution;
+        return LocaleKeys.diseaseSolution_hispa.tr();
       case 3:
-        return StringResource.leafBlastSolution;
+        return LocaleKeys.diseaseSolution_leafBlast.tr();
       default:
-        return StringResource.unknown;
+        return LocaleKeys.diseaseSolution_unknown.tr();
     }
   }
 }

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -9,13 +8,13 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:virice/src/routes/routeName.dart';
 import 'package:virice/src/utilities/diseaseDetail.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:virice/generated/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ResultPage extends StatefulWidget {
   final String? file;
   final String? index;
-  final Uint8List? uint8listImage;
-  ResultPage({Key? key, this.file, this.index, this.uint8listImage})
-      : super(key: key);
+  ResultPage({Key? key, this.file, this.index}) : super(key: key);
 
   @override
   _ResultPageState createState() => _ResultPageState();
@@ -53,7 +52,7 @@ class _ResultPageState extends State<ResultPage> {
     ImageGallerySaver.saveImage(pngBytes!);
     print("Save image");
     Fluttertoast.showToast(
-        msg: "Đã lưu ảnh",
+        msg: LocaleKeys.savedImage.tr(),
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         backgroundColor: Colors.green,
@@ -87,7 +86,7 @@ class _ResultPageState extends State<ResultPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            "Kết quả",
+            LocaleKeys.result.tr(),
             style: Theme.of(context).textTheme.headline1,
           ),
           actions: [
@@ -125,21 +124,15 @@ class _ResultPageState extends State<ResultPage> {
                               vertical: 20, horizontal: 10),
                           width: double.infinity,
                           height: height * 0.4,
-                          child: widget.file != null
-                              ? Image.file(
-                                  File(widget.file as String),
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.memory(
-                                  widget.uint8listImage as Uint8List,
-                                  height: height * 0.4,
-                                  fit: BoxFit.cover,
-                                )),
-                      _indexWidget("Bệnh được dự đoán"),
+                          child: Image.file(
+                            File(widget.file as String),
+                            fit: BoxFit.cover,
+                          )),
+                      _indexWidget(LocaleKeys.diseaseName_title.tr()),
                       _contentWidget(name),
-                      _indexWidget("Nguyên nhân"),
+                      _indexWidget(LocaleKeys.diseaseReason_title.tr()),
                       _contentWidget(reason),
-                      _indexWidget("Phòng trừ"),
+                      _indexWidget(LocaleKeys.diseaseSolution_title.tr()),
                       _contentWidget(solution)
                     ],
                   ),

@@ -5,7 +5,8 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:virice/src/routes/routeName.dart';
 import 'package:virice/src/services/cameraService.dart';
 import 'package:virice/src/services/tensorflowService.dart';
-import 'package:virice/src/utilities/StringResource.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:virice/generated/locale_keys.g.dart';
 
 class CameraPage extends StatefulWidget {
   final CameraDescription cameraDescription;
@@ -70,26 +71,27 @@ class _CameraPageState extends State<CameraPage>
         _cameraService.pauseCamera();
         _animationDialogController.forward();
         _showDialog(
-            content: StringResource.isntRice,
+            content: LocaleKeys.predictedResult_isntRice.tr(),
             imgPath: "assets/img/error.png",
             children: [
-              _dialogButton(Colors.green, onPressTryButton, "Thử lại",
-                  Colors.transparent),
-              _dialogButton(Colors.red, onPressExitButton, "Thoát", Colors.red)
+              _dialogButton(Colors.green, onPressTryButton,
+                  LocaleKeys.tryAgain.tr(), Colors.transparent),
+              _dialogButton(Colors.red, onPressExitButton, LocaleKeys.exit.tr(),
+                  Colors.red)
             ]);
       } else {
         print(">>>>>>>>>>>>>This object is a rice");
         _cameraService.pauseCamera();
         _animationDialogController.forward();
         _showDialog(
-            content: StringResource.isRice,
+            content: LocaleKeys.predictedResult_isRice.tr(),
             imgPath: "assets/img/complete.png",
             children: [
               _dialogButton(Colors.white, () {
                 onPressPredictionButton(indexLabel);
-              }, StringResource.result, Theme.of(context).primaryColor),
+              }, LocaleKeys.result.tr(), Theme.of(context).primaryColor),
               _dialogButton(Theme.of(context).primaryColor, onPressTryButton,
-                  StringResource.tryAgain, Colors.transparent)
+                  LocaleKeys.tryAgain.tr(), Colors.transparent)
             ]);
       }
     });
@@ -136,7 +138,7 @@ class _CameraPageState extends State<CameraPage>
     _cameraService.stopDetection();
     isCameraStop = true;
     EasyLoading.instance..indicatorType = EasyLoadingIndicatorType.cubeGrid;
-    EasyLoading.show(status: "Đang xử lý");
+    EasyLoading.show(status: LocaleKeys.processing.tr());
     String path = await _cameraService.takeImage();
     print(">>>>>>>>>>>>>>>>>>>>>>>>path $path");
     Navigator.of(context).pushNamed(RouteName.RESULT_PAGE,
@@ -165,6 +167,7 @@ class _CameraPageState extends State<CameraPage>
 
     return OutlinedButton(
         style: ButtonStyle(
+            fixedSize: MaterialStateProperty.all(Size.fromWidth(120)),
             backgroundColor: MaterialStateProperty.all(backgroundColor),
             side: MaterialStateProperty.all(BorderSide(color: color)),
             shape: MaterialStateProperty.all(RoundedRectangleBorder(
@@ -218,8 +221,8 @@ class _CameraPageState extends State<CameraPage>
                           children: <Widget>[
                             Container(
                               margin: EdgeInsets.only(bottom: 15),
-                              child: const Text(
-                                "Kết quả dự đoán",
+                              child: Text(
+                                LocaleKeys.predictedResult_title.tr(),
                                 style: TextStyle(
                                     fontSize: 22, fontWeight: FontWeight.w600),
                               ),
@@ -285,7 +288,7 @@ class _CameraPageState extends State<CameraPage>
                                 borderRadius: BorderRadius.circular(10)),
                             padding: EdgeInsets.all(15),
                             child: Text(
-                              "Di chuyển đến lá lúa cần dự đoán",
+                              LocaleKeys.infor.tr(),
                               style: Theme.of(context).textTheme.headline3,
                             ),
                           ),
@@ -295,7 +298,7 @@ class _CameraPageState extends State<CameraPage>
               ]);
         }
         // return Container(child: CircularProgressIndicator());
-        return Text("Đang khởi tạo");
+        return Text(LocaleKeys.processing.tr());
       },
     );
   }

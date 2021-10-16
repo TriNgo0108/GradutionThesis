@@ -1,0 +1,43 @@
+{
+    "language":"english",
+    "title":"Predict disease",
+    "fromCamera":"From camera",
+    "fromGallery":"From gallery",
+    "description":"Select image from the gallery or take an image from camera to predict",
+    "infor":"Move to rice leaf need predicting",
+    "tryAgain":"Try again",
+    "exit":"Exit",
+    "result":"Result",
+    "predictedResult":{
+        "title":"Predicted result",
+        "isRice":"This is a rice leaf. \n Press result button see the result",
+        "isntRice":"This isn't a rice leaf. \n Please try again!"
+    },
+    "processing":"Processing",
+    "savedImage":"Saved image",
+    "diseaseName":{
+        "title":"Predicted disease",
+        "healthy":"None",
+        "brownSpot":"Brown spot",
+        "hispa":"Hispa",
+        "leafBlast":"Leaf blast",
+        "unknown":"unknown"
+    },
+    "diseaseReason":{
+        "title":"Reason",
+        "healthy":"None",
+        "leafBlast":"Caused by the fungus Pirycularia Oryzea Cav. In conditions of high humidity, the number of spores grows a lot and with favorable conditions of temperature and humidity, the fungus will penetrate the plant, the fungus secretes a number of toxins that inhibit the respiration and growth of rice plants.",
+        "hispa":"Adults and larvae of the rice beetle, scientifically known as Dicladispa armigera. Adults scrape the upper surface of the leaf blade to expose the lower cuticle. They lay eggs inside small crevices of soft leaves, usually at the tips of the leaves. Bug larvae are flattened, yellow to white. They feed inside the leaf tissue by burrowing along the leaf axis, and then pupate inside the leaf. Adults are slightly square in shape, with a length and width of 3-5 mm. They are dark green or black in color, with spines all over the body. Overgrown weeds, excessive fertilization, heavy rain and high relative humidity are favorable conditions for the infection of this rice beetle.",
+        "brownSpot":"The disease is caused by the fungus Bipolaris Oryzae.\n Harmful arising due to abnormally high temperature and low humidity weather. Rice plants that are often starved or fail to meet their nutrient and water needs are also the cause of disease outbreaks. The disease caused strong damage in the period when the rice plants were at the height of their growing season, about to flower. They attack on leaves, sheaths, shoots and even rice seeds.",
+        "unknown":"unknown"
+    },
+    "diseaseSolution":{
+        "title":"Solution",
+        "healthy":"Take care of the field regularly, prevent other diseases",
+        "brownSpot":"It is necessary to visit the fields regularly to identify and not to be confused with blast disease. Focus on caring for and maintaining reasonable irrigation water from 2 to 5cm. Sufficient and balanced NPK fertilizer in accordance with the growth and development period for healthy rice plants and limiting the harmful growth of fungal diseases.",
+        "hispa":"Clean weeds in fields and embankments. Exterminate young pests on seedlings of the upcoming season by removing damaged leaves with spiny beetles.",
+        "leafBlast":"Clean up residues of straw and disease-carrying weeds in the field; sowing varieties resistant or resistant to blast disease",
+        "unknown":"unknown"
+    }
+
+}

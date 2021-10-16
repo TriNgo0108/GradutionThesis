@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:virice/generated/locale_keys.g.dart';
 import 'package:virice/src/routes/routeName.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:virice/src/services/tensorflowService.dart';
-import 'package:virice/src/utilities/StringResource.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -46,7 +47,7 @@ class _HomePageState extends State<HomePage>
     XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       EasyLoading.instance..indicatorType = EasyLoadingIndicatorType.cubeGrid;
-      EasyLoading.show(status: "Đang xử lý");
+      EasyLoading.show(status: LocaleKeys.processing.tr());
       var recognitions = await _tensorflowService.runModelonImage(image.path);
       if (recognitions != 4) {
         Navigator.of(context).pushNamed(RouteName.RESULT_PAGE,
@@ -58,7 +59,7 @@ class _HomePageState extends State<HomePage>
         EasyLoading.dismiss();
         _animationDialogController.forward();
         _showDialog(
-            content: StringResource.isntRice,
+            content: LocaleKeys.predictedResult_isntRice.tr(),
             imgPath: "assets/img/error.png",
             child: OutlinedButton(
                 style: ButtonStyle(
@@ -74,7 +75,7 @@ class _HomePageState extends State<HomePage>
                   });
                 },
                 child: Text(
-                  StringResource.tryAgain,
+                  LocaleKeys.tryAgain.tr(),
                   style: TextStyle(fontSize: 18, color: Colors.white),
                 )));
       }
@@ -127,8 +128,8 @@ class _HomePageState extends State<HomePage>
                           children: <Widget>[
                             Container(
                               margin: EdgeInsets.only(bottom: 15),
-                              child: const Text(
-                                "Thông báo",
+                              child: Text(
+                                LocaleKeys.predictedResult_title.tr(),
                                 style: TextStyle(
                                     fontSize: 22, fontWeight: FontWeight.w600),
                               ),
@@ -195,7 +196,7 @@ class _HomePageState extends State<HomePage>
                         },
                         icon: FaIcon(FontAwesomeIcons.fileImport),
                         label: Text(
-                          "Từ thư viện",
+                          LocaleKeys.fromGallery.tr(),
                           style: TextStyle(
                               color: Theme.of(context).primaryColor,
                               fontSize: 20),
@@ -215,7 +216,7 @@ class _HomePageState extends State<HomePage>
                         },
                         icon: FaIcon(FontAwesomeIcons.camera),
                         label: Text(
-                          "Từ camera",
+                          LocaleKeys.fromCamera.tr(),
                           style: TextStyle(
                               color: Theme.of(context).primaryColor,
                               fontSize: 20),
@@ -244,6 +245,14 @@ class _HomePageState extends State<HomePage>
   }
 
   @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    context.setLocale(Locale("en"));
+    setState(() {});
+  }
+
+  @override
   void dispose() {
     super.dispose();
     _tensorflowService.close();
@@ -255,7 +264,7 @@ class _HomePageState extends State<HomePage>
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Dự đoán bệnh"),
+        title: Text(LocaleKeys.title).tr(),
       ),
       body: SafeArea(
         child: Column(
@@ -282,7 +291,7 @@ class _HomePageState extends State<HomePage>
                     Padding(
                       padding: const EdgeInsets.only(top: 20),
                       child: Text(
-                        "Chọn ảnh từ thư viện hoặc chụp ảnh để dự đoán",
+                        LocaleKeys.description.tr(),
                         style: Theme.of(context).textTheme.headline1,
                         textAlign: TextAlign.center,
                       ),
@@ -298,14 +307,14 @@ class _HomePageState extends State<HomePage>
                     onPressed: _onGallery,
                     icon: FaIcon(FontAwesomeIcons.fileImport),
                     label: Text(
-                      "Từ thư viện",
+                      LocaleKeys.fromGallery.tr(),
                       style: Theme.of(context).textTheme.headline2,
                     )),
                 ElevatedButton.icon(
                     onPressed: _onCamera,
                     icon: FaIcon(FontAwesomeIcons.camera),
                     label: Text(
-                      "Từ camera",
+                      LocaleKeys.fromCamera.tr(),
                       style: Theme.of(context).textTheme.headline2,
                     ))
               ],

@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:virice/src/app.dart';
+import 'package:easy_localization/easy_localization.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding();
-  runApp(ViRice());
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+  runApp(EasyLocalization(
+      child: ViRice(),
+      supportedLocales: [Locale("en"), Locale("vi")],
+      path: 'assets/translations'));
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:virice/src/pages/homePage.dart';
 import 'package:virice/src/routes/Routes.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ViRice extends StatelessWidget {
   const ViRice({Key? key}) : super(key: key);
@@ -10,6 +11,9 @@ class ViRice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       title: "ViRice",
       home: HomePage(),
       theme: ThemeData(
