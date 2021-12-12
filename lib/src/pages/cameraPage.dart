@@ -7,6 +7,7 @@ import 'package:virice/src/services/cameraService.dart';
 import 'package:virice/src/services/tensorflowService.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:virice/generated/locale_keys.g.dart';
+import 'package:virice/src/utilities/diseaseDetail.dart';
 
 class CameraPage extends StatefulWidget {
   final CameraDescription cameraDescription;
@@ -83,13 +84,15 @@ class _CameraPageState extends State<CameraPage>
         print(">>>>>>>>>>>>>This object is a rice");
         _cameraService.pauseCamera();
         _animationDialogController.forward();
+        String diseaseName = DiseaseDetail.getName(indexLabel);
         _showDialog(
-            content: LocaleKeys.predictedResult_isRice.tr(),
+            content: LocaleKeys.predictedResult_isRice
+                .tr(namedArgs: {"name": diseaseName}),
             imgPath: "assets/img/complete.png",
             children: [
               _dialogButton(Colors.white, () {
                 onPressPredictionButton(indexLabel);
-              }, LocaleKeys.result.tr(), Theme.of(context).primaryColor),
+              }, LocaleKeys.detail.tr(), Theme.of(context).primaryColor),
               _dialogButton(Theme.of(context).primaryColor, onPressTryButton,
                   LocaleKeys.tryAgain.tr(), Colors.transparent)
             ]);

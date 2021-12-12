@@ -9,9 +9,10 @@
     "tryAgain":"Try again",
     "exit":"Exit",
     "result":"Result",
+    "detail":"Detail",
     "predictedResult":{
         "title":"Predicted result",
-        "isRice":"This is a rice leaf. \n Press result button see the result",
+        "isRice":"Disease: {name}. \n  Detail information ? Press the result button",
         "isntRice":"This isn't a rice leaf. \n Please try again!"
     },
     "processing":"Processing",

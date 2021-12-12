@@ -11,6 +11,7 @@ abstract class  LocaleKeys {
   static const tryAgain = 'tryAgain';
   static const exit = 'exit';
   static const result = 'result';
+  static const detail = 'detail';
   static const predictedResult_title = 'predictedResult.title';
   static const predictedResult_isRice = 'predictedResult.isRice';
   static const predictedResult_isntRice = 'predictedResult.isntRice';

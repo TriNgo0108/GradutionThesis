@@ -75,10 +75,10 @@ class _ResultPageState extends State<ResultPage> {
 
   @override
   Widget build(BuildContext context) {
-    DiseaseDetail disease = new DiseaseDetail(int.parse(widget.index ?? "4"));
-    var name = disease.getName();
-    var reason = disease.getReason();
-    var solution = disease.getSolution();
+    int diseaseIndex = int.parse(widget.index ?? "4");
+    var name = DiseaseDetail.getName(diseaseIndex);
+    var reason = DiseaseDetail.getReason(diseaseIndex);
+    var solution = DiseaseDetail.getSolution(diseaseIndex);
     IconThemeData iconThemeData = Theme.of(context).iconTheme;
     final height = MediaQuery.of(context).size.height;
     return WillPopScope(
